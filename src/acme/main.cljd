@@ -1,19 +1,31 @@
 (ns acme.main
   (:require ["package:flutter/material.dart" :as m]
+            ["package:flutter_tts/flutter_tts.dart" :refer [FlutterTts]]
             [cljd.flutter :as f]))
 
 (defn main []
   (f/run
-    (m/MaterialApp
-      .title "Welcome to Flutter"
-      .theme (m/ThemeData .primarySwatch m.Colors/pink))
-    .home
-    (m/Scaffold
-      .appBar (m/AppBar
-                .title (m/Text "Welcome to ClojureDart")))
-    .body
-    m/Center
-    (m/Text "Let's get coding!"
-       .style (m/TextStyle
-                .color m.Colors/red
-                .fontSize 32.0))))
+   :watch [enabled? (atom true) :as button-state]
+   :managed [tts (doto (FlutterTts)
+                   (.setLanguage "en-US")
+                   (.setCompletionHandler #(reset! button-state true)))
+             :dispose .stop]
+   (m/MaterialApp
+    .title "Welcome to Flutter"
+    .theme (m/ThemeData .primarySwatch m.Colors/pink))
+   .home
+   (m/Scaffold
+    .appBar (m/AppBar
+             .title (m/Text "Welcome to ClojureDart")))
+   .body
+   m/Center
+   (m/OutlinedButton
+    .onPressed
+    (when enabled?
+      (fn press-callback []
+        (reset! button-state false)
+        (.speak tts "Let's get coding!"))))
+   (m/Text "Get some cheers!"
+           .style (m/TextStyle
+                   .color m.Colors/red
+                   .fontSize 32.0))))
