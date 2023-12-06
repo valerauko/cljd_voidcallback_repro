@@ -1,6 +1,6 @@
 (ns acme.main
   (:require ["package:flutter/material.dart" :as m]
-            ["package:flutter/foundation.dart" :as fnd]
+            ["package:flutter/foundation.dart" :refer [VoidCallback]]
             ["package:flutter_tts/flutter_tts.dart" :refer [FlutterTts]]
             [cljd.flutter :as f]))
 
@@ -39,7 +39,11 @@
         ;; Error while compiling (let [old-handler (.-completionHandler tts) new-handler (fn temporary-completion-handler [] (.setCompletionHandler tts old-handler) (reset! button-state true) (swap! counter inc))] (.setCompletionHandler tts new-handler) (.speak tts "Let's get coding!"))
         ;; ⛔️ Stream closed
         ;; Faulty subform and/or expansion (let [old-handler (.-completionHandler tts) new-handler (fn temporary-completion-handler [] (.setCompletionHandler tts old-handler) (reset! button-state true) (swap! counter inc))] (.setCompletionHandler tts new-handler) (.speak tts "Let's get coding!"))
-        (let [^fnd/VoidCallback old-handler (.-completionHandler tts)
+        ;;
+        ;; If I try to refer VoidCallback
+        ;; Unhandled exception:
+        ;; TypeAliasElement type not handled, please contact cljd team @dupuchba or @cgrand
+        (let [^VoidCallback old-handler (.-completionHandler tts)
               new-handler (fn temporary-completion-handler []
                             ;; reset the handler to the original one first
                             (.setCompletionHandler tts old-handler)
