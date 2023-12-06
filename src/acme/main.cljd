@@ -25,9 +25,17 @@
     (when enabled?
       (fn press-callback []
         (reset! button-state false)
-        (let [new-handler (fn temporary-completion-handler []
+        ;; If I try to grab the current handler and then put it back, it gives the error below (no type hint)
+        ;;
+        ;; Performing hot reload...
+        ;; lib/cljd-out/acme/main.dart:313:17: Error: The method 'call' isn't defined for the class 'Never?'.
+        ;; Try correcting the name to the name of an existing method, or defining a method named 'call'.
+        ;; return maybe_f$1();
+        ;;                 ^
+        (let [old-handler (.-completionHandler tts)
+              new-handler (fn temporary-completion-handler []
                             ;; reset the handler to the original one first
-                            (.setCompletionHandler tts #(reset! button-state true))
+                            (.setCompletionHandler tts old-handler)
                             ;; in this handler, do something else!
                             (reset! button-state true)
                             (swap! counter inc))]
