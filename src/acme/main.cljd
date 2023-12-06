@@ -26,6 +26,9 @@
     (when enabled?
       (fn press-callback []
         (reset! button-state false)
+        ;; FlutterTts .completionHandler is a foundation/VoidCallback?
+        ;;   https://github.com/dlutton/flutter_tts/blob/826eeee50f88fccc7710d04efdebbf7d68eed283/lib/flutter_tts.dart#L335
+        ;;
         ;; If I try to grab the current handler and then put it back, it gives the error below (no type hint)
         ;;
         ;; Performing hot reload...
