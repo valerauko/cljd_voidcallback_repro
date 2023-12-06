@@ -1,6 +1,6 @@
 (ns acme.main
   (:require ["package:flutter/material.dart" :as m]
-            ["package:flutter/foundation.dart" :refer [VoidCallback]]
+            ;; ["package:flutter/foundation.dart" :refer [VoidCallback]]
             ["package:flutter_tts/flutter_tts.dart" :refer [FlutterTts]]
             [cljd.flutter :as f]))
 
@@ -43,7 +43,14 @@
         ;; If I try to refer VoidCallback
         ;; Unhandled exception:
         ;; TypeAliasElement type not handled, please contact cljd team @dupuchba or @cgrand
-        (let [^VoidCallback old-handler (.-completionHandler tts)
+        ;;
+        ;; If I try to hint it as ^void (since that's the return type of the callback Function)
+        ;; lib/cljd-out/acme/main.dart:313:17: Error: The method 'call' isn't defined for the class 'Never?'.
+        ;; Try correcting the name to the name of an existing method, or defining a method named 'call'.
+        ;; return maybe_f$1();
+        ;;                 ^
+        ;; Target kernel_snapshot failed: Exception
+        (let [^void old-handler (.-completionHandler tts)
               new-handler (fn temporary-completion-handler []
                             ;; reset the handler to the original one first
                             (.setCompletionHandler tts old-handler)
