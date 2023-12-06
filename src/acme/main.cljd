@@ -5,7 +5,8 @@
 
 (defn main []
   (f/run
-   :watch [enabled? (atom true) :as button-state]
+   :watch [enabled? (atom true) :as button-state
+           number (atom 0) :as counter]
    :managed [tts (doto (FlutterTts)
                    (.setLanguage "en-US")
                    (.setCompletionHandler #(reset! button-state true)))
@@ -24,8 +25,16 @@
     (when enabled?
       (fn press-callback []
         (reset! button-state false)
-        (.speak tts "Let's get coding!"))))
-   (m/Text "Get some cheers!"
-           .style (m/TextStyle
-                   .color m.Colors/red
-                   .fontSize 32.0))))
+        (let [new-handler (fn temporary-completion-handler []
+                            ;; reset the handler to the original one first
+                            (.setCompletionHandler tts #(reset! button-state true))
+                            ;; in this handler, do something else!
+                            (reset! button-state true)
+                            (swap! counter inc))]
+          (.setCompletionHandler tts new-handler)
+          (.speak tts "Let's get coding!")))))
+   (m/Text
+    (str "Get some cheers! x" number)
+    .style (m/TextStyle
+            .color m.Colors/red
+            .fontSize 32.0))))
