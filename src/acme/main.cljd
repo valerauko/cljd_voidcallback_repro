@@ -1,5 +1,6 @@
 (ns acme.main
   (:require ["package:flutter/material.dart" :as m]
+            ["package:flutter/foundation.dart" :as fnd]
             ["package:flutter_tts/flutter_tts.dart" :refer [FlutterTts]]
             [cljd.flutter :as f]))
 
@@ -32,7 +33,13 @@
         ;; Try correcting the name to the name of an existing method, or defining a method named 'call'.
         ;; return maybe_f$1();
         ;;                 ^
-        (let [old-handler (.-completionHandler tts)
+        ;;
+        ;; If I try to assert that it's not null by hinting it as fnd/VoidCallback
+        ;;   https://api.flutter.dev/flutter/dart-ui/VoidCallback.html
+        ;; Error while compiling (let [old-handler (.-completionHandler tts) new-handler (fn temporary-completion-handler [] (.setCompletionHandler tts old-handler) (reset! button-state true) (swap! counter inc))] (.setCompletionHandler tts new-handler) (.speak tts "Let's get coding!"))
+        ;; ⛔️ Stream closed
+        ;; Faulty subform and/or expansion (let [old-handler (.-completionHandler tts) new-handler (fn temporary-completion-handler [] (.setCompletionHandler tts old-handler) (reset! button-state true) (swap! counter inc))] (.setCompletionHandler tts new-handler) (.speak tts "Let's get coding!"))
+        (let [^fnd/VoidCallback old-handler (.-completionHandler tts)
               new-handler (fn temporary-completion-handler []
                             ;; reset the handler to the original one first
                             (.setCompletionHandler tts old-handler)
